@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Sidebar, type View } from "./components/Sidebar";
+import { MobileHeader } from "./components/MobileHeader";
+import { BottomNav } from "./components/BottomNav";
 import { TopBar } from "./components/TopBar";
 import { TaskBoard } from "./components/TaskBoard";
 import { NotesBoard } from "./components/NotesBoard";
@@ -126,6 +128,7 @@ function AuthenticatedApp({
       />
 
       <div className="main">
+        <MobileHeader workspaces={workspaces} activeWorkspace={activeWorkspace} />
         <TopBar tasks={tasks} notes={notes} user={user} onNavigate={setView} onRecoveryCode={onRecoveryCode} />
 
         {view === "tasks" && (
@@ -137,6 +140,8 @@ function AuthenticatedApp({
         {view === "calendar" && <CalendarView tasks={tasks} />}
         {view === "focus" && <FocusView />}
       </div>
+
+      <BottomNav view={view} onChange={setView} taskCount={tasks.length} noteCount={notes.length} />
     </div>
   );
 }

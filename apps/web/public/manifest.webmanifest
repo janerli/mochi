@@ -1,0 +1,12 @@
+{
+  "name": "mochi — задачи и заметки",
+  "short_name": "mochi",
+  "description": "Личный таск-трекер с заметками",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff6ed",
+  "theme_color": "#ff88a6",
+  "icons": [
+    { "src": "/icons/icon-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
