@@ -75,7 +75,26 @@ export function registerAuthRoutes(app: FastifyInstance) {
   });
 
   app.get("/api/auth/me", { preHandler: authenticate }, async (req) => {
-    return { id: req.user!.sub, email: req.user!.email };
+    const user = await prisma.user.findUnique({ where: { id: req.user!.sub } });
+    return { id: req.user!.sub, email: req.user!.email, name: user?.name ?? null, avatar: user?.avatar ?? null };
+  });
+
+  app.patch("/api/auth/me", { preHandler: authenticate }, async (req, reply) => {
+    const body = req.body as { name?: string | null; avatar?: string | null };
+
+    if (body.name !== undefined && body.name !== null && body.name.trim().length > 60) {
+      return reply.code(400).send({ error: "имя слишком длинное" });
+    }
+
+    const user = await prisma.user.update({
+      where: { id: req.user!.sub },
+      data: {
+        ...(body.name !== undefined ? { name: body.name?.trim() || null } : {}),
+        ...(body.avatar !== undefined ? { avatar: body.avatar } : {}),
+      },
+    });
+
+    return { id: user.id, email: user.email, name: user.name, avatar: user.avatar };
   });
 
   // Forgot-password flow — no email involved: the one-time recovery code

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import type { Note, Task } from "../api";
+import type { AuthUser, Note, Task } from "../api";
 import { useLogout } from "../api";
+import { Avatar } from "./Avatar";
 import { SearchBox } from "./SearchBox";
 import { SettingsModal } from "./SettingsModal";
 import type { View } from "./Sidebar";
@@ -8,7 +9,7 @@ import type { View } from "./Sidebar";
 interface Props {
   tasks: Task[];
   notes: Note[];
-  email: string;
+  user: AuthUser;
   onNavigate: (view: View) => void;
   onRecoveryCode: (code: string, title: string) => void;
 }
@@ -23,7 +24,7 @@ function isToday(iso: string) {
   );
 }
 
-export function TopBar({ tasks, notes, email, onNavigate, onRecoveryCode }: Props) {
+export function TopBar({ tasks, notes, user, onNavigate, onRecoveryCode }: Props) {
   const logout = useLogout();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">(
@@ -50,7 +51,7 @@ export function TopBar({ tasks, notes, email, onNavigate, onRecoveryCode }: Prop
   return (
     <header className="topbar">
       <div className="greeting">
-        <h1>Привет 🌸</h1>
+        <h1>Привет{user.name ? `, ${user.name}` : ""} 🌸</h1>
         <p>{dateLabel}</p>
       </div>
       <SearchBox tasks={tasks} notes={notes} onNavigate={onNavigate} />
@@ -71,9 +72,13 @@ export function TopBar({ tasks, notes, email, onNavigate, onRecoveryCode }: Prop
           🌙
         </button>
       </div>
-      <div className="avatar" title={email} />
-      <button className="btn-ghost" onClick={() => setSettingsOpen(true)} aria-label="Настройки">
-        ⚙️
+      <button
+        className="btn-ghost profile-button"
+        onClick={() => setSettingsOpen(true)}
+        aria-label="Настройки профиля"
+      >
+        <Avatar avatar={user.avatar} fallbackLetter={user.name || user.email} title={user.name || user.email} />
+        {user.name && <span className="profile-button-name">{user.name}</span>}
       </button>
       <button className="btn-ghost" onClick={() => logout.mutate()}>
         Выйти

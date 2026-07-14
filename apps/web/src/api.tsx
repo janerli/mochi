@@ -109,6 +109,8 @@ export async function request<T>(url: string, options?: RequestInit): Promise<T>
 export interface AuthUser {
   id: string;
   email: string;
+  name?: string | null;
+  avatar?: string | null;
 }
 
 export interface AuthUserWithRecoveryCode extends AuthUser {
@@ -156,6 +158,15 @@ export function useResetPassword() {
       qc.setQueryData(["me"], { id: user.id, email: user.email });
       qc.invalidateQueries({ queryKey: ["workspaces"] });
     },
+  });
+}
+
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name?: string | null; avatar?: string | null }) =>
+      request<AuthUser>("/api/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
+    onSuccess: (user) => qc.setQueryData(["me"], user),
   });
 }
 

@@ -18,6 +18,7 @@ import {
   useSetActiveWorkspaceId,
   WorkspaceProvider,
   type Workspace,
+  type AuthUser,
 } from "./api";
 import { useTaskReminders } from "./useTaskReminders";
 
@@ -39,7 +40,7 @@ export function App() {
         <LoginView onRecoveryCode={showRecoveryCode} />
       ) : (
         <WorkspaceProvider>
-          <WorkspaceGate email={me.data.email} onRecoveryCode={showRecoveryCode} />
+          <WorkspaceGate user={me.data} onRecoveryCode={showRecoveryCode} />
         </WorkspaceProvider>
       )}
 
@@ -58,10 +59,10 @@ export function App() {
 // one selected — falls back to the personal workspace the first time, or if
 // the previously-active one no longer exists (e.g. the user left it).
 function WorkspaceGate({
-  email,
+  user,
   onRecoveryCode,
 }: {
-  email: string;
+  user: AuthUser;
   onRecoveryCode: (code: string, title: string) => void;
 }) {
   const workspacesQuery = useWorkspaces();
@@ -83,7 +84,7 @@ function WorkspaceGate({
 
   return (
     <AuthenticatedApp
-      email={email}
+      user={user}
       onRecoveryCode={onRecoveryCode}
       workspaces={workspaces}
       activeWorkspace={activeWorkspace}
@@ -92,12 +93,12 @@ function WorkspaceGate({
 }
 
 function AuthenticatedApp({
-  email,
+  user,
   onRecoveryCode,
   workspaces,
   activeWorkspace,
 }: {
-  email: string;
+  user: AuthUser;
   onRecoveryCode: (code: string, title: string) => void;
   workspaces: Workspace[];
   activeWorkspace: Workspace;
@@ -125,7 +126,7 @@ function AuthenticatedApp({
       />
 
       <div className="main">
-        <TopBar tasks={tasks} notes={notes} email={email} onNavigate={setView} onRecoveryCode={onRecoveryCode} />
+        <TopBar tasks={tasks} notes={notes} user={user} onNavigate={setView} onRecoveryCode={onRecoveryCode} />
 
         {view === "tasks" && (
           <TaskBoard tasks={tasks} isLoading={tasksQuery.isLoading} workspaceId={activeWorkspace.id} />
