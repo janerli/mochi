@@ -1,4 +1,5 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import cookie from "@fastify/cookie";
@@ -84,10 +85,12 @@ app.get("/api/health", async () => ({ ok: true }));
 // load this one URL with no CORS/cookie cross-origin complications. Unset in
 // local dev, where Vite's own dev server + proxy handles the frontend instead.
 if (process.env.STATIC_DIR) {
-  // @fastify/static requires an absolute path — resolve relative to cwd so
-  // the env var can just be "apps/web/dist" instead of a platform-specific
-  // absolute path.
-  await app.register(fastifyStatic, { root: path.resolve(process.env.STATIC_DIR) });
+  // @fastify/static requires an absolute path. Resolve relative to this
+  // file's location (repo-root/server/{src in dev, dist in prod}), not
+  // process.cwd() — `npm run start -w server` runs with cwd = server/, so a
+  // cwd-relative resolve would look for apps/web/dist *inside* server/.
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+  await app.register(fastifyStatic, { root: path.resolve(repoRoot, process.env.STATIC_DIR) });
 }
 
 app.listen({ port: PORT, host: "0.0.0.0" }).catch((err) => {
