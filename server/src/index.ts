@@ -80,6 +80,14 @@ registerTagRoutes(app, io);
 
 app.get("/api/health", async () => ({ ok: true }));
 
+// Hit by an external cron every few minutes to stop Render's free-tier
+// instance from spinning down after 15 min idle. Touches the database too
+// so the Supabase pooler connection doesn't go stale, not just the process.
+app.get("/api/keep-alive", async () => {
+  await prisma.$queryRaw`SELECT 1`;
+  return { ok: true, time: new Date().toISOString() };
+});
+
 // Set in production (Render) — serves the built `apps/web/dist` from the same
 // origin as the API, so the browser and the Electron desktop app both just
 // load this one URL with no CORS/cookie cross-origin complications. Unset in
