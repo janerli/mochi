@@ -1,0 +1,38 @@
+{
+  "name": "desktop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Mochi — личный таск-трекер и заметки",
+  "author": "Mochi",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "wait-on http://localhost:5173 && electron .",
+    "dist": "electron-builder --win --dir",
+    "installer": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "43.1.0",
+    "electron-builder": "^26.15.3",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.mochi.app",
+    "productName": "Mochi",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": ["electron/**/*", "build/icon.png", "package.json"],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    }
+  }
+}

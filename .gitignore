@@ -1,0 +1,8 @@
+node_modules/
+dist/
+dist-electron/
+.env
+apps/desktop/release/
+.DS_Store
+*.tsbuildinfo
+bash.exe.stackdump

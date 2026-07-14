@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: mochi-server
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build -w apps/web && npm run build -w server
+    startCommand: npm run db:deploy -w server && npm run start -w server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: STATIC_DIR
+        value: apps/web/dist
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: attachments

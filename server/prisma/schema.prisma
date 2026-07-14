@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Supabase gives you two connection strings: a pooled one (port 6543, via
+  // PgBouncer — use for normal app traffic) and a direct one (port 5432 —
+  // required for migrations, since they need a real session, not a pooled one).
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id               String            @id @default(cuid())
+  email            String            @unique
+  passwordHash     String
+  recoveryCodeHash String?
+  createdAt        DateTime          @default(now())
+  ownedWorkspaces  Workspace[]       @relation("OwnedWorkspaces")
+  memberships      WorkspaceMember[]
+  focusSessions    FocusSession[]
+}
+
+model Workspace {
+  id         String            @id @default(cuid())
+  name       String
+  isPersonal Boolean           @default(false)
+  inviteCode String            @unique
+  owner      User              @relation("OwnedWorkspaces", fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId    String
+  members    WorkspaceMember[]
+  tasks      Task[]
+  notes      Note[]
+  noteGroups NoteGroup[]
+  createdAt  DateTime          @default(now())
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  role        String    @default("member") // "owner" | "member"
+  joinedAt    DateTime  @default(now())
+
+  @@unique([workspaceId, userId])
+}
+
+model Task {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  status          String    @default("todo") // "todo" | "in_progress" | "done"
+  priority        String    @default("medium") // "low" | "medium" | "high"
+  dueDate         DateTime?
+  tag             String?
+  order           Int       @default(0)
+  recurrence      String    @default("none") // "none" | "daily" | "weekly" | "monthly"
+  estimateMinutes Int?
+  reminderMinutesBefore Int? // null = no reminder; 0 = at due time
+  notes           Note[]
+  attachments     Attachment[]
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId     String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Attachment {
+  id          String   @id @default(cuid())
+  filename    String   // original filename, shown to the user
+  storagePath String   // object key inside the Supabase Storage bucket
+  size        Int      // bytes
+  mimeType    String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId      String
+  createdAt   DateTime @default(now())
+}
+
+model NoteGroup {
+  id          String    @id @default(cuid())
+  name        String
+  order       Int       @default(0)
+  notes       Note[]
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+  createdAt   DateTime  @default(now())
+}
+
+model FocusSession {
+  id              String   @id @default(cuid())
+  durationMinutes Int
+  completedAt     DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+}
+
+model Note {
+  id          String     @id @default(cuid())
+  kind        String     @default("quick") // "quick" | "big"
+  title       String
+  content     String
+  color       String     @default("pink") // "pink" | "mint" | "lavender" | "butter"
+  pinned      Boolean    @default(false)
+  task        Task?      @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  taskId      String?
+  group       NoteGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  groupId     String?
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}

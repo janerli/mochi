@@ -1,0 +1,19 @@
+{
+  "name": "mochi",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "server",
+    "apps/web",
+    "apps/desktop"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c green,magenta \"npm run dev -w server\" \"npm run dev -w apps/web\"",
+    "dev:desktop": "concurrently -n server,web,desktop -c green,magenta,cyan \"npm run dev -w server\" \"npm run dev -w apps/web\" \"npm run dev -w apps/desktop\"",
+    "db:migrate": "npm run db:migrate -w server",
+    "db:studio": "npm run db:studio -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
