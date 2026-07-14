@@ -11,7 +11,7 @@ Menu.setApplicationMenu(null);
 // server — no embedded backend, no local database. Update this once the
 // Render service is live; can also be overridden via the MOCHI_SERVER_URL
 // env var without rebuilding, e.g. for a self-hosted deployment.
-const PRODUCTION_SERVER_URL = process.env.MOCHI_SERVER_URL ?? "https://mochi-server.onrender.com";
+const PRODUCTION_SERVER_URL = process.env.MOCHI_SERVER_URL ?? "https://mochi-server-r105.onrender.com";
 
 function createWindow() {
   const win = new BrowserWindow({
