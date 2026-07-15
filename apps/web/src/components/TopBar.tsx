@@ -55,13 +55,18 @@ export function TopBar({ tasks, notes, user, onNavigate, onRecoveryCode }: Props
         <p>{dateLabel}</p>
       </div>
       <SearchBox tasks={tasks} notes={notes} onNavigate={onNavigate} />
-      {doneToday > 0 && <div className="chip streak">✅ {doneToday} сегодня</div>}
+      {doneToday > 0 && (
+        <div className="chip streak">
+          ✅ {doneToday} <span className="btn-label">сегодня</span>
+        </div>
+      )}
       {notifyPermission === "default" && (
         <button
           className="btn-ghost"
           onClick={() => Notification.requestPermission().then(setNotifyPermission)}
+          aria-label="Включить напоминания"
         >
-          🔔 Включить напоминания
+          🔔 <span className="btn-label">Включить напоминания</span>
         </button>
       )}
       <div className="theme-toggle">
@@ -80,8 +85,9 @@ export function TopBar({ tasks, notes, user, onNavigate, onRecoveryCode }: Props
         <Avatar avatar={user.avatar} fallbackLetter={user.name || user.email} title={user.name || user.email} />
         {user.name && <span className="profile-button-name">{user.name}</span>}
       </button>
-      <button className="btn-ghost" onClick={() => logout.mutate()}>
-        Выйти
+      <button className="btn-ghost" onClick={() => logout.mutate()} aria-label="Выйти">
+        <span className="btn-label">Выйти</span>
+        <span className="btn-label-short" aria-hidden>⏻</span>
       </button>
 
       {settingsOpen && (

@@ -336,6 +336,7 @@ a, button { cursor: pointer; }
 
 .profile-button { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; }
 .profile-button-name { font-weight: 800; color: var(--ink); font-size: .82rem; }
+.btn-label-short { display: none; }
 
 /* ---------- Board ---------- */
 .board { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; align-items: start; }
@@ -622,12 +623,19 @@ a, button { cursor: pointer; }
   .bottom-nav { display: flex; }
   .main { padding-bottom: 64px; }
 
-  .topbar { flex-wrap: wrap; padding: 14px 16px; gap: 10px; }
-  .greeting { flex: 1; min-width: 0; }
-  .greeting h1 { font-size: 1.2rem; }
+  .topbar { flex-wrap: wrap; padding: 12px 16px; gap: 8px; align-items: center; }
+  .greeting { flex: 1; min-width: 0; order: 0; }
+  .greeting h1 { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .greeting p { display: none; }
   .search-wrap { margin-left: 0; order: 10; width: 100%; }
-  .chip.streak { order: 9; }
+  .chip.streak { padding: 6px 9px; flex-shrink: 0; }
+  .btn-label { display: none; }
+  .btn-label-short { display: inline; }
+  .theme-toggle { flex-shrink: 0; }
+  .theme-toggle button { padding: 6px 9px; }
+  .profile-button { padding: 2px; }
+  .profile-button-name { display: none; }
+  header.topbar > .btn-ghost:not(.profile-button) { padding: 8px 10px; flex-shrink: 0; }
 
   .view { padding: 16px 16px 32px; }
   .view-head h2 { font-size: 1.1rem; }
