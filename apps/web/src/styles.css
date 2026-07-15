@@ -540,9 +540,11 @@ a, button { cursor: pointer; }
 .cal-cell {
   background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
   min-height: 92px; padding: 8px; display: flex; flex-direction: column; gap: 4px;
+  width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer;
 }
 .cal-cell.outside { opacity: .4; }
 .cal-cell.today { border-color: var(--pink); box-shadow: 0 0 0 1.5px var(--pink); }
+.cal-cell.selected:not(.today) { background: var(--pink-wash); border-color: var(--pink); }
 .cal-date { font-weight: 800; font-size: .8rem; color: var(--ink-soft); }
 .cal-cell.today .cal-date { color: var(--pink-strong); }
 .cal-tasks { display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
@@ -553,6 +555,28 @@ a, button { cursor: pointer; }
 .cal-task.dot-pink { background: var(--pink-wash); color: var(--pink-ink); }
 .cal-task.dot-mint { background: var(--mint-wash); color: var(--mint-ink); }
 .cal-task.dot-butter { background: var(--butter-wash); color: var(--butter-ink); }
+
+/* Priority dots — used in-cell on phone widths and in the agenda list below. */
+.cal-dots { display: none; gap: 3px; flex-wrap: wrap; margin-top: auto; }
+.cal-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.cal-dot.dot-pink { background: var(--pink); }
+.cal-dot.dot-mint { background: var(--mint); }
+.cal-dot.dot-butter { background: var(--butter); }
+
+/* Agenda for the tapped day — phone only, see media query. Cells are too
+   narrow there to show task text, so this spells the selected day out. */
+.cal-agenda { display: none; margin-top: 18px; }
+.cal-agenda-date { font-weight: 800; font-size: .92rem; margin: 0 0 10px; color: var(--ink); }
+.cal-agenda-list { display: flex; flex-direction: column; gap: 8px; }
+.cal-agenda-item {
+  display: flex; align-items: center; gap: 9px; padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+}
+.cal-agenda-time { font-size: .76rem; font-weight: 800; color: var(--ink-soft); flex-shrink: 0; }
+.cal-agenda-title {
+  font-size: .85rem; font-weight: 700; color: var(--ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 /* ---------- Focus session ---------- */
 .focus-wrap { display: flex; flex-direction: column; align-items: center; gap: 24px; padding-top: 20px; }
@@ -645,4 +669,15 @@ a, button { cursor: pointer; }
 
   .new-form .row, .note-modal-foot .row { flex-wrap: wrap; }
   .new-form .row > *, .note-modal-foot .row > * { flex: 1 1 130px; }
+
+  /* Calendar: a 92px-tall, text-in-cell grid squeezed into 7 phone-width
+     columns is unreadable. Cells shrink to just a date + priority dots, and
+     the tapped day's tasks are spelled out in the agenda list below instead. */
+  .calendar { gap: 4px; }
+  .cal-cell { min-height: 42px; padding: 5px 3px; gap: 2px; border-radius: 10px; }
+  .cal-date { font-size: .72rem; }
+  .cal-weekday { font-size: .6rem; }
+  .cal-tasks { display: none; }
+  .cal-dots { display: flex; }
+  .cal-agenda { display: block; }
 }

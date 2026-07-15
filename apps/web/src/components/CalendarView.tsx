@@ -25,6 +25,7 @@ function buildGrid(monthDate: Date) {
 
 export function CalendarView({ tasks }: { tasks: Task[] }) {
   const [cursor, setCursor] = useState(() => new Date());
+  const [selectedDay, setSelectedDay] = useState(() => new Date());
   const today = new Date();
 
   const days = useMemo(() => buildGrid(cursor), [cursor]);
@@ -42,6 +43,17 @@ export function CalendarView({ tasks }: { tasks: Task[] }) {
     }
     return map;
   }, [tasks]);
+
+  const selectedKey = `${selectedDay.getFullYear()}-${selectedDay.getMonth()}-${selectedDay.getDate()}`;
+  const selectedDayTasks = useMemo(
+    () =>
+      (tasksByDay.get(selectedKey) ?? [])
+        .slice()
+        .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime()),
+    [tasksByDay, selectedKey],
+  );
+  const rawSelectedLabel = selectedDay.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+  const selectedDayLabel = rawSelectedLabel.charAt(0).toUpperCase() + rawSelectedLabel.slice(1);
 
   return (
     <section className="view">
@@ -70,11 +82,17 @@ export function CalendarView({ tasks }: { tasks: Task[] }) {
           const key = `${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`;
           const dayTasks = tasksByDay.get(key) ?? [];
           return (
-            <div
+            <button
               key={key}
-              className={`cal-cell ${inMonth ? "" : "outside"} ${sameDay(day, today) ? "today" : ""}`}
+              type="button"
+              className={`cal-cell ${inMonth ? "" : "outside"} ${sameDay(day, today) ? "today" : ""} ${
+                sameDay(day, selectedDay) ? "selected" : ""
+              }`}
+              onClick={() => setSelectedDay(day)}
             >
               <span className="cal-date">{day.getDate()}</span>
+
+              {/* Full task pills — desktop only, hidden on phone widths (see media query). */}
               <div className="cal-tasks">
                 {dayTasks.map((t) => (
                   <span key={t.id} className={`cal-task dot-${PRIORITY_DOT[t.priority]}`} title={t.title}>
@@ -83,9 +101,41 @@ export function CalendarView({ tasks }: { tasks: Task[] }) {
                   </span>
                 ))}
               </div>
-            </div>
+
+              {/* Small priority dots — phone only, a cell is too narrow for readable task text. */}
+              {dayTasks.length > 0 && (
+                <div className="cal-dots">
+                  {dayTasks.slice(0, 4).map((t) => (
+                    <span key={t.id} className={`cal-dot dot-${PRIORITY_DOT[t.priority]}`} />
+                  ))}
+                </div>
+              )}
+            </button>
           );
         })}
+      </div>
+
+      {/* Selected day's tasks spelled out — phone only, stands in for the
+          in-cell text pills that don't fit at that width. */}
+      <div className="cal-agenda">
+        <p className="cal-agenda-date">{selectedDayLabel}</p>
+        {selectedDayTasks.length === 0 ? (
+          <p className="empty-hint" style={{ padding: 0 }}>
+            Нет задач на этот день
+          </p>
+        ) : (
+          <div className="cal-agenda-list">
+            {selectedDayTasks.map((t) => (
+              <div key={t.id} className="cal-agenda-item">
+                <span className={`cal-dot dot-${PRIORITY_DOT[t.priority]}`} />
+                <span className="cal-agenda-time">
+                  {new Date(t.dueDate!).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}
+                </span>
+                <span className="cal-agenda-title">{t.title}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
